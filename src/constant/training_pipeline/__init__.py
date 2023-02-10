@@ -22,3 +22,5 @@ SCHEDULER_PARAMS = {"step_size": 1, "gamma": 0.7}
 SAVED_MODEL_NAME: str = "mnist_model.pt"
 
 DEVICE: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+ARTIFACTS_DIR: str = "artifacts"

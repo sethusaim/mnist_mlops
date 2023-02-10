@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader
 
 from src.entity.config_entity import PipelineConfig
 from src.exception import MNISTException
+from src.logger import logging
 
 
 class ModelEvaluation:
@@ -45,7 +46,16 @@ class ModelEvaluation:
             test_loss /= len(test_loader.dataset)
 
             print(
-                "\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n".format(
+                "Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n".format(
+                    test_loss,
+                    correct,
+                    len(test_loader.dataset),
+                    100.0 * correct / len(test_loader.dataset),
+                )
+            )
+
+            logging.info(
+                "Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n".format(
                     test_loss,
                     correct,
                     len(test_loader.dataset),

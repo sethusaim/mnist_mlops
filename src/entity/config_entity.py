@@ -1,5 +1,11 @@
 from src.constant import training_pipeline
 import torch
+import os
+
+
+artifacts_dir: str = os.path.join(
+    training_pipeline.ARTIFACTS_DIR, training_pipeline.TIMESTAMP
+)
 
 
 class PipelineConfig:
@@ -8,9 +14,16 @@ class PipelineConfig:
 
         self.seed: int = training_pipeline.SEED
 
-        self.saved_model_name: str = training_pipeline.SAVED_MODEL_NAME
-
         self.device: torch.device = training_pipeline.DEVICE
+
+
+class DataIngestionConfig:
+    def __init__(self):
+        self.data_path: str = os.path.join(artifacts_dir, "data_ingestion")
+
+        self.train_data_path: str = os.path.join(self.data_path, "train")
+
+        self.test_data_path: str = os.path.join(self.data_path, "test")
 
 
 class ModelTrainingConfig:
@@ -26,3 +39,9 @@ class ModelTrainingConfig:
         self.scheduler_params: dict = training_pipeline.SCHEDULER_PARAMS
 
         self.optimizer_params: dict = training_pipeline.OPTIMIZER_PARAMS
+
+        self.model_dir: str = os.path.join(artifacts_dir, "model_training")
+
+        self.saved_model_path: str = os.path.join(
+            self.model_dir, training_pipeline.SAVED_MODEL_NAME
+        )

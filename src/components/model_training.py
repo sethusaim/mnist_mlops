@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader
 
 from src.entity.config_entity import ModelTrainingConfig, PipelineConfig
 from src.exception import MNISTException
+from src.logger import logging
 
 
 class ModelTrainer:
@@ -50,16 +51,25 @@ class ModelTrainer:
 
                 optimizer.step()
 
-                if batch_idx % self.model_trainer_config.log_interval == 0:
-                    print(
-                        "Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
-                            epoch,
-                            batch_idx * len(data),
-                            len(train_loader.dataset),
-                            100.0 * batch_idx / len(train_loader),
-                            loss.item(),
-                        )
-                    )
+            print(
+                "Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
+                    epoch,
+                    batch_idx * len(data),
+                    len(train_loader.dataset),
+                    100.0 * batch_idx / len(train_loader),
+                    loss.item(),
+                )
+            )
+
+            logging.info(
+                "Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
+                    epoch,
+                    batch_idx * len(data),
+                    len(train_loader.dataset),
+                    100.0 * batch_idx / len(train_loader),
+                    loss.item(),
+                )
+            )
 
         except Exception as e:
             raise MNISTException(e, sys)

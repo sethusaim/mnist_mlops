@@ -9,11 +9,11 @@ from src.components.data_ingestion import DataIngestion
 from src.components.data_loader import MNISTDataLoader
 from src.components.model_evaluation import ModelEvaluation
 from src.components.model_training import ModelTrainer
-from src.entity.artifact_entity import (DataIngestionArtifact,
-                                        DataLoaderArtifact)
+from src.entity.artifact_entity import DataIngestionArtifact, DataLoaderArtifact
 from src.entity.config_entity import ModelTrainingConfig, PipelineConfig
 from src.exception import MNISTException
 from src.ml.model.arch import Net
+from src.logger import logging
 
 
 class TrainPipeline:
@@ -34,27 +34,47 @@ class TrainPipeline:
         """
         We are trying to train a model using the MNIST dataset
         """
+        logging.info("Entered run_pipeline method of TrainPipeline class")
+
         try:
             data_ingestion_artifact: DataIngestionArtifact = (
                 self.data_ingestion.initiate_data_ingestion()
             )
+
+            logging.info(f"Data Ingestion artifact is : {data_ingestion_artifact}")
 
             data_loader_artifact: DataLoaderArtifact = self.data_loader.get_dataloaders(
                 train_dataset=data_ingestion_artifact.train_dataset,
                 test_dataset=data_ingestion_artifact.test_dataset,
             )
 
+            logging.info(f"Data Loader Artifact is {data_loader_artifact}")
+
             torch.manual_seed(self.pipeline_config.seed)
 
             model: nn.Module = Net().to(self.pipeline_config.device)
+
+            logging.info(
+                f"Initialized the model architecture at {self.pipeline_config.device}"
+            )
 
             optimizer: Optimizer = Adadelta(
                 model.parameters(), **self.model_trainer_config.optimizer_params
             )
 
+            logging.info(
+                f"Configured optimizer with params as {self.model_trainer_config.optimizer_params}"
+            )
+
             scheduler: _LRScheduler = StepLR(
                 optimizer, **self.model_trainer_config.scheduler_params
             )
+
+            logging.info(
+                f"Configured scheduler with params as {self.model_trainer_config.scheduler_params}"
+            )
+
+            logging.info("Started model training")
 
             for epoch in range(1, self.model_trainer_config.epochs + 1):
                 self.model_trainer.train(
@@ -70,7 +90,13 @@ class TrainPipeline:
 
                 scheduler.step()
 
-            torch.save(model, self.pipeline_config.saved_model_name)
+            logging.info("Completed model training")
+
+            torch.save(model, self.model_trainer_config.saved_model_path)
+
+            logging.info(
+                f"Saved the trained model to {self.model_trainer_config.saved_model_path}"
+            )
 
         except Exception as e:
             raise MNISTException(e, sys)
