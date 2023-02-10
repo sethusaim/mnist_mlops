@@ -1,1 +1,1 @@
-# mnsit_mlops
+# MNIST MLOps
