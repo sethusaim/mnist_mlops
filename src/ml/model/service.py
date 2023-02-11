@@ -27,17 +27,17 @@ async def predict_image(f: PILImage) -> NDArray[Any]:
     b = io.BytesIO()
 
     f.save(b, "jpeg")
-    
+
     my_transform = transforms.Compose(
-                [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
-            )
-    
+        [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
+    )
+
     image = PILImage.open(b)
 
     image = torch.from_numpy(np.array(my_transform(image).unsqueeze(0)))
-        
+
     batch_ret = await runner.async_run(image)
-    
+
     pred = torch.argmax(batch_ret, dim=1).detach().cpu().tolist()
-        
-    return json.dumps({"prediction":pred[0]})
+
+    return json.dumps({"prediction": pred[0]})

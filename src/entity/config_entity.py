@@ -49,7 +49,8 @@ class ModelTrainingConfig:
 
 class ModelPusherConfig:
     def __init__(self):
-        self.bento_model_service: str = training_pipeline.MODEL_PUSHER_BENTOML_SERVICE_NAME
-        
+        self.bento_model_service: str = (
+            training_pipeline.MODEL_PUSHER_BENTOML_SERVICE_NAME
+        )
+
         self.bento_model_image: str = training_pipeline.MODEL_PUSHER_BENTOML_IMAGE_NAME
-        
