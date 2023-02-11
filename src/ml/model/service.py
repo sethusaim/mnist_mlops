@@ -1,16 +1,17 @@
 import io
+import json
 from typing import Any
 
 import bentoml
 import numpy as np
 import torch
-import json
 from bentoml import Service
 from bentoml._internal.runner import Runner
-from bentoml.io import Image, JSON
+from bentoml.io import JSON, Image
 from numpy.typing import NDArray
 from PIL import Image as PILImage
 from torchvision.transforms import transforms
+
 from src.constant import training_pipeline
 
 bento_model = bentoml.pytorch.get(training_pipeline.MODEL_PUSHER_BENTOML_MODEL_NAME)

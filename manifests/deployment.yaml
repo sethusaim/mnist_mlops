@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mnist-classifier
+  name: mnist-classifier
+spec:
+  selector:
+    matchLabels:
+      app: mnist-classifier
+  template:
+    metadata:
+      labels:
+        app: mnist-classifier
+    spec:
+      containers:
+      - image: charlie2056/mnist-mlops:latest
+        imagePullPolicy: IfNotPresent
+        name: mnist-classifier
+        ports:
+        - containerPort: 3000
