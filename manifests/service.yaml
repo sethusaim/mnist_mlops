@@ -6,9 +6,9 @@ metadata:
   name: mnist-classifier
 spec:
   ports:
-  - name: classify
-    port: 3000
-    targetPort: 3000
+    - name: classify
+      port: 3000
+      targetPort: 3000
   selector:
     app: mnist-classifier
   type: LoadBalancer
