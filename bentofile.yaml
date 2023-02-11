@@ -9,3 +9,5 @@ python:
     - torchvision
   extra_index_url:
     - "https://download.pytorch.org/whl/cpu"
+docker:
+  base_image: python:3.8-slim-buster

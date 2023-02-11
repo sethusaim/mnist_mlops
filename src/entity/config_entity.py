@@ -45,3 +45,11 @@ class ModelTrainingConfig:
         self.saved_model_path: str = os.path.join(
             self.model_dir, training_pipeline.SAVED_MODEL_NAME
         )
+
+
+class ModelPusherConfig:
+    def __init__(self):
+        self.bento_model_service: str = training_pipeline.MODEL_PUSHER_BENTOML_SERVICE_NAME
+        
+        self.bento_model_image: str = training_pipeline.MODEL_PUSHER_BENTOML_IMAGE_NAME
+        

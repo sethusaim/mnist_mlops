@@ -30,3 +30,5 @@ ARTIFACTS_DIR: str = "artifacts"
 MODEL_PUSHER_BENTOML_MODEL_NAME: str = "mnist_pytorch_model"
 
 MODEL_PUSHER_BENTOML_SERVICE_NAME: str = "mnist_model_service"
+
+MODEL_PUSHER_BENTOML_IMAGE_NAME: str = "mnist_image"
