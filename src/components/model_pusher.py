@@ -6,10 +6,10 @@ from src.exception import MNISTException
 
 
 class ModelPusher:
-    def __init__(self, model_pusher_config: ModelPusherConfig):
-        self.model_pusher_config: ModelPusherConfig = model_pusher_config
+    def __init__(self):
+        self.model_pusher_config: ModelPusherConfig = ModelPusherConfig()
 
-    def build_and_push_image(self):
+    def build_bento_image(self):
         try:
             os.system("bentoml build")
 

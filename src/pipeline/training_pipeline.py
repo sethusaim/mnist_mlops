@@ -14,6 +14,7 @@ from src.components.data_ingestion import DataIngestion
 from src.components.data_loader import MNISTDataLoader
 from src.components.model_evaluation import ModelEvaluation
 from src.components.model_training import ModelTrainer
+from src.components.model_pusher import ModelPusher
 from src.configuration.mlflow_connection import MLFlowClient
 from src.entity.artifact_entity import (
     DataIngestionArtifact,
@@ -41,6 +42,8 @@ class TrainPipeline:
         self.data_ingestion: DataIngestion = DataIngestion()
 
         self.mlflow_client = MLFlowClient().client
+        
+        self.model_pusher: ModelPusher = ModelPusher()
 
     def run_pipeline(self):
         """
@@ -123,7 +126,9 @@ class TrainPipeline:
             torch.save(model, self.model_trainer_config.saved_model_path)
 
             bentoml.pytorch.save_model(name="mnist_pytorch_model", model=model)
-
+            
+            self.model_pusher.build_bento_image()
+            
             logging.info(
                 f"Saved the trained model to {self.model_trainer_config.saved_model_path}"
             )
