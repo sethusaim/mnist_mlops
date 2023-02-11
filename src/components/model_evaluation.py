@@ -1,20 +1,22 @@
 import sys
 
+import mlflow
 import torch
-from torch import nn
 from torch.nn import functional as F
 from torch.utils.data import DataLoader
 
+from src.entity.artifact_entity import ModelEvaluationArtifact
 from src.entity.config_entity import PipelineConfig
 from src.exception import MNISTException
 from src.logger import logging
+from src.ml.model.arch import Net
 
 
 class ModelEvaluation:
     def __init__(self):
         self.pipeline_config = PipelineConfig()
 
-    def test(self, model: nn.Module, test_loader: DataLoader) -> None:
+    def test(self, model: Net, test_loader: DataLoader) -> ModelEvaluationArtifact:
         """
         It takes a model and a test_loader as input, and then it evaluates the model on the test_loader.
 
@@ -45,23 +47,27 @@ class ModelEvaluation:
 
             test_loss /= len(test_loader.dataset)
 
-            print(
-                "Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n".format(
-                    test_loss,
-                    correct,
-                    len(test_loader.dataset),
-                    100.0 * correct / len(test_loader.dataset),
+            test_accuracy = correct / len(test_loader.dataset)
+
+            mlflow.log_metric(key="test_loss", value=test_loss)
+
+            mlflow.log_metric(key="test_accuracy", value=test_accuracy)
+
+            model_evaluation_artifact: ModelEvaluationArtifact = (
+                ModelEvaluationArtifact(
+                    test_loss=test_loss, test_accuracy=test_accuracy
                 )
             )
 
+            print(f"Test set : Average loss : {test_loss}, Accuracy : {test_accuracy}")
+
             logging.info(
-                "Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n".format(
-                    test_loss,
-                    correct,
-                    len(test_loader.dataset),
-                    100.0 * correct / len(test_loader.dataset),
-                )
+                f"Test set : Average loss : {test_loss}, Accuracy : {test_accuracy}"
             )
+
+            logging.info(f"Model Evaluation artifact is {model_evaluation_artifact}")
+
+            return model_evaluation_artifact
 
         except Exception as e:
             raise MNISTException(e, sys)

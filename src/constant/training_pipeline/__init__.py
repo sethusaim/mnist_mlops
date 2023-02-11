@@ -3,7 +3,9 @@ import torch
 
 TIMESTAMP: datetime = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
 
-EPOCHS: int = 10
+MLFLOW_TRACKING_URI_KEY: str = "MLFLOW_TRACKING_URI"
+
+EPOCHS: int = 1
 
 SEED: int = 1
 
@@ -24,3 +26,7 @@ SAVED_MODEL_NAME: str = "mnist_model.pt"
 DEVICE: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 ARTIFACTS_DIR: str = "artifacts"
+
+MODEL_PUSHER_BENTOML_MODEL_NAME: str = "mnist_pytorch_model"
+
+MODEL_PUSHER_BENTOML_SERVICE_NAME: str = "mnist_model_service"

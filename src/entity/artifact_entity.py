@@ -14,3 +14,10 @@ class DataLoaderArtifact:
     train_dataloader: DataLoader
 
     test_dataloader: DataLoader
+
+
+@dataclass
+class ModelEvaluationArtifact:
+    test_loss: float
+
+    test_accuracy: float

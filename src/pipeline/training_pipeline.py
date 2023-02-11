@@ -1,6 +1,11 @@
+import os
 import sys
+import tempfile
 
+import bentoml
+import mlflow
 import torch
+
 from torch import nn
 from torch.optim import Adadelta, Optimizer
 from torch.optim.lr_scheduler import StepLR, _LRScheduler
@@ -9,11 +14,16 @@ from src.components.data_ingestion import DataIngestion
 from src.components.data_loader import MNISTDataLoader
 from src.components.model_evaluation import ModelEvaluation
 from src.components.model_training import ModelTrainer
-from src.entity.artifact_entity import DataIngestionArtifact, DataLoaderArtifact
+from src.configuration.mlflow_connection import MLFlowClient
+from src.entity.artifact_entity import (
+    DataIngestionArtifact,
+    DataLoaderArtifact,
+    ModelEvaluationArtifact,
+)
 from src.entity.config_entity import ModelTrainingConfig, PipelineConfig
 from src.exception import MNISTException
-from src.ml.model.arch import Net
 from src.logger import logging
+from src.ml.model.arch import Net
 
 
 class TrainPipeline:
@@ -30,11 +40,17 @@ class TrainPipeline:
 
         self.data_ingestion: DataIngestion = DataIngestion()
 
+        self.mlflow_client = MLFlowClient().client
+
     def run_pipeline(self):
         """
         We are trying to train a model using the MNIST dataset
         """
         logging.info("Entered run_pipeline method of TrainPipeline class")
+
+        mlflow.set_tracking_uri(uri=self.mlflow_client.tracking_uri)
+
+        mlflow.set_experiment(experiment_name="test")
 
         try:
             data_ingestion_artifact: DataIngestionArtifact = (
@@ -74,25 +90,39 @@ class TrainPipeline:
                 f"Configured scheduler with params as {self.model_trainer_config.scheduler_params}"
             )
 
+            os.makedirs(self.model_trainer_config.model_dir, exist_ok=True)
+
             logging.info("Started model training")
 
-            for epoch in range(1, self.model_trainer_config.epochs + 1):
-                self.model_trainer.train(
-                    model=model,
-                    train_loader=data_loader_artifact.train_dataloader,
-                    optimizer=optimizer,
-                    epoch=epoch,
-                )
+            with mlflow.start_run():
+                for epoch in range(1, self.model_trainer_config.epochs + 1):
+                    train_loss = self.model_trainer.train(
+                        model=model,
+                        train_loader=data_loader_artifact.train_dataloader,
+                        optimizer=optimizer,
+                        epoch=epoch,
+                    )
 
-                self.model_evaluation.test(
-                    model=model, test_loader=data_loader_artifact.test_dataloader
-                )
+                    model_evaluation_artifact: ModelEvaluationArtifact = (
+                        self.model_evaluation.test(
+                            model=model,
+                            test_loader=data_loader_artifact.test_dataloader,
+                        )
+                    )
 
-                scheduler.step()
+                    scheduler.step()
 
             logging.info("Completed model training")
 
+            mlflow.pytorch.log_model(
+                pytorch_model=model,
+                registered_model_name="mnist_pytorch_model",
+                artifact_path="mnist_pytorch_model",
+            )
+
             torch.save(model, self.model_trainer_config.saved_model_path)
+
+            bentoml.pytorch.save_model(name="mnist_pytorch_model", model=model)
 
             logging.info(
                 f"Saved the trained model to {self.model_trainer_config.saved_model_path}"

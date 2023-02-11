@@ -1,0 +1,11 @@
+service: "src.ml.model.service:svc"
+labels:
+  owner: sethusai
+include:
+- "src/ml/model/*"
+- "src/constant/training_pipeline/__init__.py"
+python:
+  packages:
+    - torchvision
+  extra_index_url:
+    - "https://download.pytorch.org/whl/cpu"
