@@ -7,7 +7,7 @@ from src.exception import MNISTException
 
 def run_inference():
     try:        
-        os.system("curl -F media=@0.png http://localhost:3000/predict_image")
+        os.system("curl -F media=@test_image.png http://localhost:3000/predict_image")
         
     except Exception as e:
         raise MNISTException(e,sys)
